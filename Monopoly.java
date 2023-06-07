@@ -33,7 +33,7 @@ public class Monopoly {
     private static int[] playerPositions = new int[]{0, 0, 0, 0};
 
     public void actionPerformed(ActionEvent e) {
-        Timer timer = new Timer(20, null);
+        Timer timer = new Timer(100, null);
         Random random = new Random();
         int[] diceRolls = new int[10];
 
@@ -50,6 +50,7 @@ public class Monopoly {
 
                 if (rollIndex[0] >= diceRolls.length - 1) {
                     timer.stop();
+                    
                 } else {
                     rollIndex[0]++;
                 }
@@ -86,18 +87,106 @@ public class Monopoly {
     public static void main(String[] args) {
         loadDiceImages();
 
-        String playerInput = JOptionPane.showInputDialog(null, "Please enter the number of players(2-4):", "Number of players", JOptionPane.QUESTION_MESSAGE);
-        int numPlayers;
-        try {
-            numPlayers = Integer.parseInt(playerInput);
-            if (numPlayers < 2 || numPlayers > 4) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "The number of players entered is invalid, please enter an integer between 2 and 4.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        //Creat a window ask players to type the number of players
+        SwingUtilities.invokeLater(() -> {
+        JFrame frame = new JFrame("Monopoly");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 600);
 
+        // Define initial panel
+        JPanel startPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                try {
+                    Image background = ImageIO.read(new File("Monopoly_start.png"));
+                    g.drawImage(background, 0, 0, this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        
+        startPanel.setLayout(null);
+        // Define start and exit buttons
+        JButton startButton = new JButton("Start Game");
+        startButton.setBounds(200, 200, 160, 50); 
+        startPanel.add(startButton);
+        startButton.addActionListener(e -> {
+            startPanel.setVisible(false);
+            selectPlayers(frame);
+        });
+
+        JButton exitButton = new JButton("Exit Game");
+        exitButton.setBounds(200, 260, 160, 50); 
+        startPanel.add(exitButton);
+        exitButton.addActionListener(e -> System.exit(0));
+
+        startPanel.add(startButton);
+        startPanel.add(exitButton);
+
+        frame.add(startPanel);
+        frame.setVisible(true);
+    });
+}
+public static void selectPlayers(JFrame frame) {
+    
+    
+     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 600);
+
+        // Define initial panel
+        JPanel playerPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                try {
+                    Image background = ImageIO.read(new File("Monopoly_start.png"));
+                    g.drawImage(background, 0, 0, this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+    playerPanel.setLayout(null);
+    int buttonX = 180; 
+    int buttonY = 200;
+    
+    for (int i = 2; i <= 4; i++) {
+    JButton playerButton = new JButton(i + " Players");
+    int finalI = i;
+    playerButton.addActionListener(e -> {
+        playerPanel.setVisible(false);
+        initGame(frame, finalI);
+    });
+    
+    playerButton.setBounds(buttonX, buttonY, 180, 50); 
+    buttonY += 75; 
+    playerPanel.add(playerButton);
+}
+
+    frame.add(playerPanel);
+    playerPanel.setVisible(true);
+}
+
+public static void initGame(JFrame frame, int numPlayers) {
+    players = new ArrayList<>();
+
+    for (int i = 0; i < numPlayers; i++) {
+        String name = "Player " + (i + 1);
+        players.add(new Player(name, playerColors[i], 1500));
+    }
+
+    playerPositions = new int[numPlayers];
+    for (int i = 0; i < numPlayers; i++) {
+        playerPositions[i] = players.get(i).getPosition();
+    }
+
+    
+    frame.getContentPane().removeAll();
+    frame.repaint();
+    
         players = new ArrayList<>();
 
         for (int i = 0; i < numPlayers; i++) {
@@ -111,7 +200,7 @@ public class Monopoly {
         }
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Monopoly");
+           
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1200, 700);
 
@@ -154,6 +243,7 @@ public class Monopoly {
                             panel.repaint();
                             JOptionPane.showMessageDialog(null, "You have bought " + currentProperty.getName() + " for $" + price + ".", "Success", JOptionPane.INFORMATION_MESSAGE);
                             buyPropertyButton.setEnabled(false);
+                             updateCurrentPlayerMoney();
                             players.get(currentPlayer).addProperty(currentPosition);
                         }
                     } else {
@@ -176,7 +266,7 @@ public class Monopoly {
 
             rollDiceButton.addActionListener(e -> {
 
-                Timer timer = new Timer(10, null);
+                Timer timer = new Timer(20, null);
                 Random random = new Random();
                 int[] diceRolls = new int[10];
 
@@ -223,7 +313,7 @@ public class Monopoly {
                     buyPropertyButton.setEnabled(false);
                     updateCurrentPlayerLabel();
                     turn++;
-                    Game.checkTurn(turn, players, frame);
+                    Game.checkTurn(turn, players, properties);
 
                 }
 
@@ -240,7 +330,7 @@ public class Monopoly {
             panel.add(endTurnButton);
 
             JPanel bottomPanel = new JPanel();
-            bottomPanel.add(rollDiceButton);
+            bottomPanel.add(rollDiceButton);  
             bottomPanel.add(rollResultLabel);
 
             frame.add(panel, BorderLayout.CENTER);
@@ -259,6 +349,12 @@ public class Monopoly {
         endTurnButton.setEnabled(false);
 
     }
+    
+    public static void updateCurrentPlayerMoney() {
+
+        currentPlayerLabel.setText("Current Round: " + players.get(currentPlayer).getName() + " - $" + players.get(currentPlayer).getProperty().getMoney());
+        currentPlayerLabel.setForeground(players.get(currentPlayer).getColor());
+     }
 
     public static void movePlayer(int steps, int[] playerPositions, int currentPlayer) {
 
@@ -284,7 +380,7 @@ public class Monopoly {
     }
 
     private static void handleCellAction(int playerNum, int cellIndex) {
-        if (cellIndex == 1) {
+         if (cellIndex == 1) {
             // Start
             buyPropertyButton.setEnabled(false);
 
@@ -292,14 +388,27 @@ public class Monopoly {
 
             buyPropertyButton.setEnabled(false);
             Board.casino(players, currentPlayer);
+            
+         } else if (cellIndex == 6) {
 
-        } else if (cellIndex == 6 || cellIndex == 16) {
-            movePlayer(11, playerPositions, currentPlayer);
+         buyPropertyButton.setEnabled(false);
+         Board.horseRace(players, currentPlayer);
+         
+
+        } else if (cellIndex == 16) {
+             Random random = new Random();
+         int newPosition = random.nextInt(20) + 1;
+    
+            // Move the player to the new position
+            movePlayer(newPosition, playerPositions, currentPlayer);
             buyPropertyButton.setEnabled(false);
-            System.out.println(players.get(currentPlayer).getName() + " has been teleported");
+    
+            // Display the message
+             String message = players.get(currentPlayer).getName() + " has been teleported to " + properties[playerPositions[currentPlayer]].getName();
+            JOptionPane.showMessageDialog(null, message);
 
         } else {
-            Property currentProperty = properties[(cellIndex - 1) % 20];
+            Property currentProperty = properties[(cellIndex - 1)%20];
 
             if (currentProperty.getOwner() == null) {
                 buyPropertyButton.setEnabled(true);
