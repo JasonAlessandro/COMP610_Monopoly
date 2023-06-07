@@ -1,7 +1,5 @@
 package com.mycompany.monopoly;
 
-package com.mycompany.monopoly;
-
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
