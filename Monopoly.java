@@ -1,4 +1,4 @@
-package com.mycompany.monopoly;
+package monopoly;
 
 import java.awt.*;
 import javax.swing.*;
@@ -19,18 +19,21 @@ public class Monopoly {
     private static Image[] diceImages = new Image[6];
 
     // Player
-    private static ArrayList<Player> players;
-    private static int currentPlayer = 0;
+    public static ArrayList<Player> players;
+    public static int currentPlayer = 0;
     private static JLabel currentPlayerLabel;
     private static JPanel panel;
 
     //For turn
     private static int turn = 0;
 
-    private static Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
+    public static Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
 
     //Positions
-    private static int[] playerPositions = new int[]{0, 0, 0, 0};
+    public static int[] playerPositions = new int[]{0, 0, 0, 0};
+    
+    public static boolean ContinueGame = false;
+    
 
     public void actionPerformed(ActionEvent e) {
         Timer timer = new Timer(100, null);
@@ -63,26 +66,26 @@ public class Monopoly {
 
     // define properties
     private static Property[] properties = new Property[]{
-        new Property("Start", 0, 0, 0, 0, null, 1),
-        new Property("Jakarta", 500, 50, 500, 0, null, 2),
-        new Property("Bandung", 400, 40, 400, 0, null, 3),
-        new Property("Surabaya", 300, 30, 300, 0, null, 4),
-        new Property("Medan", 200, 20, 200, 0, null, 5),
-        new Property("Tp1", 0, 0, 0, 0, null, 6),
-        new Property("Sydney", 500, 50, 500, 0, null, 7),
-        new Property("Canberra", 400, 40, 400, 0, null, 8),
-        new Property("Melbourne", 300, 30, 300, 0, null, 9),
-        new Property("Perth", 200, 20, 200, 0, null, 10),
-        new Property("Casino", 0, 0, 0, 0, null, 11),
-        new Property("Auckland", 500, 50, 500, 0, null, 12),
-        new Property("Wellington", 300, 30, 300, 0, null, 13),
-        new Property("Christchurch", 400, 40, 400, 0, null, 14),
-        new Property("Dunedin", 200, 20, 200, 0, null, 15),
-        new Property("Tp2", 0, 0, 0, 0, null, 16),
-        new Property("Beijing", 300, 30, 300, 0, null, 17),
-        new Property("Shanghai", 200, 20, 200, 0, null, 18),
-        new Property("Guangzhou", 400, 40, 400, 0, null, 19),
-        new Property("Shenzhen", 500, 50, 500, 0, null, 20),};
+        new Property("Start", 0, 0, null, 1),
+        new Property("Jakarta", 500, 50, null, 2),
+        new Property("Bandung", 400, 40, null, 3),
+        new Property("Surabaya", 300, 30, null, 4),
+        new Property("Medan", 200, 20, null, 5),
+        new Property("Tp1", 0, 0, null, 6),
+        new Property("Sydney", 500, 50, null, 7),
+        new Property("Canberra", 400, 40, null, 8),
+        new Property("Melbourne", 300, 30, null, 9),
+        new Property("Perth", 200, 20, null, 10),
+        new Property("Casino", 0, 0, null, 11),
+        new Property("Auckland", 500, 50, null, 12),
+        new Property("Wellington", 300, 30, null, 13),
+        new Property("Christchurch", 400, 40, null, 14),
+        new Property("Dunedin", 200, 20, null, 15),
+        new Property("Tp2", 0, 0, null, 16),
+        new Property("Beijing", 300, 30, null, 17),
+        new Property("Shanghai", 200, 20, null, 18),
+        new Property("Guangzhou", 400, 40, null, 19),
+        new Property("Shenzhen", 500, 50, null, 20),};
 
     public static void main(String[] args) {
         loadDiceImages();
@@ -99,7 +102,7 @@ public class Monopoly {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 try {
-                    Image background = ImageIO.read(new File("Monopoly_start.png"));
+                    Image background = ImageIO.read(new File("pictures/Monopoly_start.png"));
                     g.drawImage(background, 0, 0, this);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -118,10 +121,20 @@ public class Monopoly {
         });
 
         JButton exitButton = new JButton("Exit Game");
-        exitButton.setBounds(200, 260, 160, 50); 
+        exitButton.setBounds(200, 320, 160, 50); 
         startPanel.add(exitButton);
         exitButton.addActionListener(e -> System.exit(0));
-
+        
+        JButton continueButton = new JButton("Continue LastGame");
+        continueButton.setBounds(200, 260, 160, 50);
+        continueButton.addActionListener(e -> {
+            startPanel.setVisible(false);
+            ContinueGame = true;
+             initGame(frame, 4);
+        });
+        
+        
+        startPanel.add(continueButton);
         startPanel.add(startButton);
         startPanel.add(exitButton);
 
@@ -141,7 +154,7 @@ public static void selectPlayers(JFrame frame) {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 try {
-                    Image background = ImageIO.read(new File("Monopoly_start.png"));
+                    Image background = ImageIO.read(new File("pictures/Monopoly_start.png"));
                     g.drawImage(background, 0, 0, this);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -173,31 +186,32 @@ public static void selectPlayers(JFrame frame) {
 public static void initGame(JFrame frame, int numPlayers) {
     players = new ArrayList<>();
 
-    for (int i = 0; i < numPlayers; i++) {
+    
+    
+    
+    if(ContinueGame == true)
+    {
+        Game.continuePlaying();
+        Game.checkRemovePlayer(players,properties);
+    }else
+    {
+        
+        for (int i = 0; i < numPlayers; i++) {
         String name = "Player " + (i + 1);
-        players.add(new Player(name, playerColors[i], 1500));
+        players.add(new Player(name, playerColors[i], 1500,false,i));
     }
 
     playerPositions = new int[numPlayers];
     for (int i = 0; i < numPlayers; i++) {
         playerPositions[i] = players.get(i).getPosition();
     }
-
+    Game.initializeDatabase(numPlayers);
+    }
     
     frame.getContentPane().removeAll();
     frame.repaint();
     
-        players = new ArrayList<>();
-
-        for (int i = 0; i < numPlayers; i++) {
-            String name = "Player " + (i + 1);
-            players.add(new Player(name, playerColors[i], 1500));
-        }
-
-        playerPositions = new int[numPlayers];
-        for (int i = 0; i < numPlayers; i++) {
-            playerPositions[i] = players.get(i).getPosition();
-        }
+      
 
         SwingUtilities.invokeLater(() -> {
            
@@ -209,7 +223,7 @@ public static void initGame(JFrame frame, int numPlayers) {
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
                     try {
-                        Image board = ImageIO.read(new File("Monopoly_map.png"));
+                        Image board = ImageIO.read(new File("pictures/Monopoly_map.png"));
                         g.drawImage(board, 0, 0, this);
 
                         // draw players
@@ -314,6 +328,8 @@ public static void initGame(JFrame frame, int numPlayers) {
                     updateCurrentPlayerLabel();
                     turn++;
                     Game.checkTurn(turn, players, properties);
+                    Game.saveGame(players,players.get(currentPlayer).id,currentPlayer);
+                    Game.checkWinner(players);
 
                 }
 
@@ -361,7 +377,7 @@ public static void initGame(JFrame frame, int numPlayers) {
         int newPosition = playerPositions[currentPlayer] + steps;
         if (newPosition >= 20) {
             newPosition -= 20;
-            players.get(currentPlayer).getProperty().addMoney(400);
+            players.get(currentPlayer).getProperty().addMoney(-400);
             System.out.println(players.get(currentPlayer).getName() + " passed Start. Player's money increased by 400. New balance: " + players.get(currentPlayer).getProperty().getMoney());
         }
         playerPositions[currentPlayer] = newPosition;
@@ -372,7 +388,7 @@ public static void initGame(JFrame frame, int numPlayers) {
     private static void loadDiceImages() {
         for (int i = 0; i < 6; i++) {
             try {
-                diceImages[i] = ImageIO.read(new File("d" + (i + 1) + ".png"));
+                diceImages[i] = ImageIO.read(new File("pictures/d" + (i + 1) + ".png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -388,6 +404,7 @@ public static void initGame(JFrame frame, int numPlayers) {
 
             buyPropertyButton.setEnabled(false);
             Board.casino(players, currentPlayer);
+            Game.checkWinner(players);
             
          } else if (cellIndex == 6) {
 
@@ -415,22 +432,12 @@ public static void initGame(JFrame frame, int numPlayers) {
             } else if (!currentProperty.getOwner().equals(players.get(playerNum))) {
                 int rent = currentProperty.getRent();
                 players.get(playerNum).getProperty().subtractMoney(rent);
-
+                Game.checkWinner(players);
                 currentProperty.getOwner().getProperty().addMoney(rent);
+                
             } else {
-                int choice = JOptionPane.showConfirmDialog(
-                        null,
-                        "You landed on your own property: " + currentProperty.getName() + ".\nDo you want to upgrade it?",
-                        "Upgrade Property",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE
-                );
+                System.out.println(players.get(playerNum).getName() + " landed on their own property: " + currentProperty.getName());
 
-                if (choice == JOptionPane.YES_OPTION) {
-                    currentProperty.upgradeProperty(players.get(currentPlayer));
-                } else {
-                    JOptionPane.getRootFrame().dispose();
-                }
             }
         }
 
