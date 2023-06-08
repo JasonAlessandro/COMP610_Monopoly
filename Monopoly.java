@@ -66,26 +66,40 @@ public class Monopoly {
 
     // define properties
     private static Property[] properties = new Property[]{
-        new Property("Start", 0, 0, null, 1),
-        new Property("Jakarta", 500, 50, null, 2),
-        new Property("Bandung", 400, 40, null, 3),
-        new Property("Surabaya", 300, 30, null, 4),
-        new Property("Medan", 200, 20, null, 5),
-        new Property("Tp1", 0, 0, null, 6),
-        new Property("Sydney", 500, 50, null, 7),
-        new Property("Canberra", 400, 40, null, 8),
-        new Property("Melbourne", 300, 30, null, 9),
-        new Property("Perth", 200, 20, null, 10),
-        new Property("Casino", 0, 0, null, 11),
-        new Property("Auckland", 500, 50, null, 12),
-        new Property("Wellington", 300, 30, null, 13),
-        new Property("Christchurch", 400, 40, null, 14),
-        new Property("Dunedin", 200, 20, null, 15),
-        new Property("Tp2", 0, 0, null, 16),
-        new Property("Beijing", 300, 30, null, 17),
-        new Property("Shanghai", 200, 20, null, 18),
-        new Property("Guangzhou", 400, 40, null, 19),
-        new Property("Shenzhen", 500, 50, null, 20),};
+        new Property("Start", 0, 0, 0, 0, null, 1),
+        new Property("Jakarta", 500, 50, 500, 0, null, 2),
+        new Property("Bandung", 400, 40, 400, 0, null, 3),
+        new Property("Surabaya", 300, 30, 300, 0, null, 4),
+        new Property("Medan", 200, 20, 200, 0, null, 5),
+        new Property("Tp1", 0, 0, 0, 0, null, 6),
+        new Property("Sydney", 500, 50, 500, 0, null, 7),
+        new Property("Canberra", 400, 40, 400, 0, null, 8),
+        new Property("Melbourne", 300, 30, 300, 0, null, 9),
+        new Property("Perth", 200, 20, 200, 0, null, 10),
+        new Property("Casino", 0, 0, 0, 0, null, 11),
+        new Property("Auckland", 500, 50, 500, 0, null, 12),
+        new Property("Wellington", 300, 30, 300, 0, null, 13),
+        new Property("Christchurch", 400, 40, 400, 0, null, 14),
+        new Property("Dunedin", 200, 20, 200, 0, null, 15),
+        new Property("Tp2", 0, 0, 0, 0, null, 16),
+        new Property("Beijing", 300, 30, 300, 0, null, 17),
+        new Property("Shanghai", 200, 20, 200, 0, null, 18),
+        new Property("Guangzhou", 400, 40, 400, 0, null, 19),
+        new Property("Shenzhen", 500, 50, 500, 0, null, 20),};
+    
+   public static void upgradeProperty(Player player, int position) {
+    if (player.getProperty().getMoney() >= properties[position].getUpgradeCost()) {
+        player.getProperty().subtractMoney(properties[position].getUpgradeCost());
+        
+        properties[position].setPropertyLevel(properties[position].getPropertyLevel()+1);
+        properties[position].setRent(properties[position].getRent()*2);
+        
+        System.out.println(player.getName() + " has upgraded the property " + properties[position].getName() + ".");
+    } else {
+        System.out.println(player.getName() + " doesn't have enough money to upgrade the property " + properties[position].getName() + ".");
+    }
+}
+
 
     public static void main(String[] args) {
         loadDiceImages();
@@ -198,7 +212,7 @@ public static void initGame(JFrame frame, int numPlayers) {
         
         for (int i = 0; i < numPlayers; i++) {
         String name = "Player " + (i + 1);
-        players.add(new Player(name, playerColors[i], 1500,false,i));
+        players.add(new Player(name, playerColors[i], 1500,false,i+1));
     }
 
     playerPositions = new int[numPlayers];
@@ -206,6 +220,7 @@ public static void initGame(JFrame frame, int numPlayers) {
         playerPositions[i] = players.get(i).getPosition();
     }
     Game.initializeDatabase(numPlayers);
+    Game.initializeProperties();
     }
     
     frame.getContentPane().removeAll();
@@ -259,6 +274,8 @@ public static void initGame(JFrame frame, int numPlayers) {
                             buyPropertyButton.setEnabled(false);
                              updateCurrentPlayerMoney();
                             players.get(currentPlayer).addProperty(currentPosition);
+                            properties[currentPosition].setPropertyLevel(1);
+                            Game.saveProperties(currentPosition+1,players.get(currentPlayer).id,1);
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "You don't have enough money to buy " + currentProperty.getName() + ".", "Error", JOptionPane.ERROR_MESSAGE);
@@ -322,14 +339,18 @@ public static void initGame(JFrame frame, int numPlayers) {
                     JOptionPane.showMessageDialog(null, "You have already ended your turn!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     players.get(currentPlayer).setHasEndedTurn(true);
-                    currentPlayer = (currentPlayer + 1) % players.size();
-                    rollDiceButton.setEnabled(true);
-                    buyPropertyButton.setEnabled(false);
-                    updateCurrentPlayerLabel();
-                    turn++;
-                    Game.checkTurn(turn, players, properties);
+                    
                     Game.saveGame(players,players.get(currentPlayer).id,currentPlayer);
                     Game.checkWinner(players);
+                    currentPlayer = (currentPlayer + 1) % players.size();
+                    updateCurrentPlayerLabel();
+                    rollDiceButton.setEnabled(true);
+                    buyPropertyButton.setEnabled(false);
+                    
+                    turn++;
+                    Game.checkTurn(turn, players, properties);
+                    
+                    
 
                 }
 
@@ -377,7 +398,7 @@ public static void initGame(JFrame frame, int numPlayers) {
         int newPosition = playerPositions[currentPlayer] + steps;
         if (newPosition >= 20) {
             newPosition -= 20;
-            players.get(currentPlayer).getProperty().addMoney(-400);
+            players.get(currentPlayer).getProperty().addMoney(400);
             System.out.println(players.get(currentPlayer).getName() + " passed Start. Player's money increased by 400. New balance: " + players.get(currentPlayer).getProperty().getMoney());
         }
         playerPositions[currentPlayer] = newPosition;
@@ -436,7 +457,21 @@ public static void initGame(JFrame frame, int numPlayers) {
                 currentProperty.getOwner().getProperty().addMoney(rent);
                 
             } else {
-                System.out.println(players.get(playerNum).getName() + " landed on their own property: " + currentProperty.getName());
+                
+                  int choice = JOptionPane.showConfirmDialog(
+                        null,
+                        "You landed on your own property: " + currentProperty.getName() + ".\nDo you want to upgrade it?",
+                        "Upgrade Property",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    upgradeProperty(players.get(currentPlayer),players.get(currentPlayer).getPosition());
+                    Game.saveProperties(players.get(currentPlayer).getPosition(),players.get(currentPlayer).id,properties[players.get(currentPlayer).getPosition()].getPropertyLevel());
+                }else {
+                    JOptionPane.getRootFrame().dispose();
+                }
 
             }
         }
