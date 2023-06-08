@@ -7,14 +7,17 @@ public class Property {
     private int rent;
     private Player owner;
     private int cellAddress;
+    private int upgradeCost;
+    private int propertyLevel;
 
-    public Property(String name, int cost, int rent, Player owner, int cellAddress) {
+    public Property(String name, int cost, int rent, int upgradeCost, int propertyLevel, Player owner, int cellAddress) {
         this.name = name;
         this.cost = cost;
         this.rent = rent;
+        this.upgradeCost = upgradeCost;
+        this.propertyLevel = propertyLevel;
         this.owner = null;
         this.cellAddress = cellAddress;
-    }
 
     public String getName() {
         return name;
@@ -27,6 +30,17 @@ public class Property {
     public int getRent() {
         return rent;
     }
+        
+    public int getUpgradeCost() {
+        return upgradeCost;
+    }
+
+    public int getPropertyLevel() {
+        return propertyLevel;
+    }
+
+    public void setPropertyLevel(int propertyLevel) {
+        this.propertyLevel = propertyLevel;
 
     public void setOwner(Player player) {
         this.owner = player;
