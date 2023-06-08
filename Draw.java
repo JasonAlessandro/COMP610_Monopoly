@@ -1,19 +1,17 @@
-package com.mycompany.monopoly;
+package monopoly;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Draw {
-
-    public static void drawPlayersAndProperty(Graphics g, int[] playerPositions, ArrayList<Player> players) {
-        int[][] propertyCoordinates = {
+    public static int[][] propertyCoordinates = {
             {95, 575}, {160, 545}, {245, 545}, {330, 545}, {415, 545},
             {575, 480}, {545, 420}, {545, 340}, {545, 250}, {545, 160},
             {480, 5}, {415, 35}, {330, 35}, {245, 35}, {160, 35},
             {5, 95}, {30, 160}, {30, 245}, {30, 330}, {30, 415}
         };
-        int[][][] playerPositionsCoordinates = {
+       public static int[][][] playerPositionsCoordinates = {
             {
                 {10, 575}, {130, 515}, {220, 515}, {310, 515}, {400, 515},
                 {575, 575}, {515, 460}, {515, 370}, {515, 280}, {515, 190},
@@ -40,25 +38,29 @@ public class Draw {
             }
         };
 
-        for (int i = 0; i < players.size(); i++) {
-            int positionIndex = playerPositions[i];
-            int startX = playerPositionsCoordinates[i][positionIndex][0];
-            int startY = playerPositionsCoordinates[i][positionIndex][1];
+    public static void drawPlayers(Graphics g, int[] playerPositions, ArrayList<Player> players) {
+        
 
-            g.setColor(players.get(i).getColor());
-            g.fillOval(startX, startY, 10, 10);
+       for (int i = 0; i < players.size(); i++) {
+        int positionIndex = playerPositions[i];
+        int startX = playerPositionsCoordinates[i][positionIndex][0];
+        int startY = playerPositionsCoordinates[i][positionIndex][1];
 
-            g.drawOval(startX, startY, 10, 10);
+        g.setColor(players.get(i).getColor());
+        g.fillOval(startX, startY, 10, 10);
 
-            HashSet<Integer> ownedProperties = players.get(i).getOwnedProperties();
-            for (Integer propertyIndex : ownedProperties) {
-                int x = propertyCoordinates[propertyIndex][0];
-                int y = propertyCoordinates[propertyIndex][1];
-
-                g.fillRect(x, y, 10, 10);
+        g.drawOval(startX, startY, 10, 10);
             }
 
         }
+    public static void drawProperties(Graphics g, HashSet<Integer> ownedProperties) {
+    for (Integer propertyIndex : ownedProperties) {
+        int x = propertyCoordinates[propertyIndex][0];
+        int y = propertyCoordinates[propertyIndex][1];
+
+        g.fillRect(x, y, 10, 10);
     }
+}
+    
 
 }
