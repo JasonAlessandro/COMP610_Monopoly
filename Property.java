@@ -39,5 +39,19 @@ public class Property {
     public int getCellAddress() {
         return cellAddress;
     }
+    
+    public void upgradeProperty(Player player) {
+        if (player.getProperty().getMoney() >= upgradeCost) {
+            player.getProperty().subtractMoney(upgradeCost);
+
+            propertyLevel++;
+            rent += rent;
+
+            System.out.println(player.getName() + " has upgraded the property " + getName() + ".");
+        } else {
+
+            System.out.println(player.getName() + " doesn't have enough money to upgrade the property " + getName() + ".");
+        }
+    }
 
 }
