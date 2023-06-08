@@ -1,4 +1,4 @@
-package com.mycompany.monopoly;
+package monopoly;
 
 public class Property {
 
@@ -7,10 +7,10 @@ public class Property {
     private int rent;
     private Player owner;
     private int cellAddress;
-    private int upgradeCost;
     private int propertyLevel;
-
-    public Property(String name, int cost, int rent, int upgradeCost, int propertyLevel, Player owner, int cellAddress) {
+    private int upgradeCost;
+    
+    public Property(String name, int cost, int rent,int upgradeCost,int propertyLevel, Player owner, int cellAddress) {
         this.name = name;
         this.cost = cost;
         this.rent = rent;
@@ -19,7 +19,7 @@ public class Property {
         this.owner = null;
         this.cellAddress = cellAddress;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -31,19 +31,10 @@ public class Property {
     public int getRent() {
         return rent;
     }
-        
-    public int getUpgradeCost() {
-        return upgradeCost;
+    public void setRent(int rent){
+        this.rent = rent;
     }
 
-    public int getPropertyLevel() {
-        return propertyLevel;
-    }
-
-    public void setPropertyLevel(int propertyLevel) {
-        this.propertyLevel = propertyLevel;
-    }
-    
     public void setOwner(Player player) {
         this.owner = player;
     }
@@ -56,18 +47,18 @@ public class Property {
         return cellAddress;
     }
     
-    public void upgradeProperty(Player player) {
-        if (player.getProperty().getMoney() >= upgradeCost) {
-            player.getProperty().subtractMoney(upgradeCost);
-
-            propertyLevel++;
-            rent += rent;
-
-            System.out.println(player.getName() + " has upgraded the property " + getName() + ".");
-        } else {
-
-            System.out.println(player.getName() + " doesn't have enough money to upgrade the property " + getName() + ".");
-        }
+     public int getUpgradeCost() {
+        return upgradeCost;
     }
+
+    public int getPropertyLevel() {
+        return propertyLevel;
+    }
+
+    public void setPropertyLevel(int propertyLevel) {
+        this.propertyLevel = propertyLevel;
+    }
+    
+     
 
 }
