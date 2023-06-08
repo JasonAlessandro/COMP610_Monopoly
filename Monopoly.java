@@ -418,8 +418,19 @@ public static void initGame(JFrame frame, int numPlayers) {
 
                 currentProperty.getOwner().getProperty().addMoney(rent);
             } else {
-                System.out.println(players.get(playerNum).getName() + " landed on their own property: " + currentProperty.getName());
+                int choice = JOptionPane.showConfirmDialog(
+                        null,
+                        "You landed on your own property: " + currentProperty.getName() + ".\nDo you want to upgrade it?",
+                        "Upgrade Property",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
 
+                if (choice == JOptionPane.YES_OPTION) {
+                    currentProperty.upgradeProperty(players.get(currentPlayer));
+                } else {
+                    JOptionPane.getRootFrame().dispose();
+                }
             }
         }
 
