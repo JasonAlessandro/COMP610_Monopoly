@@ -18,7 +18,8 @@ public class Property {
         this.propertyLevel = propertyLevel;
         this.owner = null;
         this.cellAddress = cellAddress;
-
+    }
+    
     public String getName() {
         return name;
     }
@@ -41,7 +42,8 @@ public class Property {
 
     public void setPropertyLevel(int propertyLevel) {
         this.propertyLevel = propertyLevel;
-
+    }
+    
     public void setOwner(Player player) {
         this.owner = player;
     }
