@@ -63,26 +63,26 @@ public class Monopoly {
 
     // define properties
     private static Property[] properties = new Property[]{
-        new Property("Start", 0, 0, null, 1),
-        new Property("Jakarta", 500, 50, null, 2),
-        new Property("Bandung", 400, 40, null, 3),
-        new Property("Surabaya", 300, 30, null, 4),
-        new Property("Medan", 200, 20, null, 5),
-        new Property("Tp1", 0, 0, null, 6),
-        new Property("Sydney", 500, 50, null, 7),
-        new Property("Canberra", 400, 40, null, 8),
-        new Property("Melbourne", 300, 30, null, 9),
-        new Property("Perth", 200, 20, null, 10),
-        new Property("Casino", 0, 0, null, 11),
-        new Property("Auckland", 500, 50, null, 12),
-        new Property("Wellington", 300, 30, null, 13),
-        new Property("Christchurch", 400, 40, null, 14),
-        new Property("Dunedin", 200, 20, null, 15),
-        new Property("Tp2", 0, 0, null, 16),
-        new Property("Beijing", 300, 30, null, 17),
-        new Property("Shanghai", 200, 20, null, 18),
-        new Property("Guangzhou", 400, 40, null, 19),
-        new Property("Shenzhen", 500, 50, null, 20),};
+        new Property("Start", 0, 0, 0, 0, null, 1),
+        new Property("Jakarta", 500, 50, 500, 0, null, 2),
+        new Property("Bandung", 400, 40, 400, 0, null, 3),
+        new Property("Surabaya", 300, 30, 300, 0, null, 4),
+        new Property("Medan", 200, 20, 200, 0, null, 5),
+        new Property("Tp1", 0, 0, 0, 0, null, 6),
+        new Property("Sydney", 500, 50, 500, 0, null, 7),
+        new Property("Canberra", 400, 40, 400, 0, null, 8),
+        new Property("Melbourne", 300, 30, 300, 0, null, 9),
+        new Property("Perth", 200, 20, 200, 0, null, 10),
+        new Property("Casino", 0, 0, 0, 0, null, 11),
+        new Property("Auckland", 500, 50, 500, 0, null, 12),
+        new Property("Wellington", 300, 30, 300, 0, null, 13),
+        new Property("Christchurch", 400, 40, 400, 0, null, 14),
+        new Property("Dunedin", 200, 20, 200, 0, null, 15),
+        new Property("Tp2", 0, 0, 0, 0, null, 16),
+        new Property("Beijing", 300, 30, 300, 0, null, 17),
+        new Property("Shanghai", 200, 20, 200, 0, null, 18),
+        new Property("Guangzhou", 400, 40, 400, 0, null, 19),
+        new Property("Shenzhen", 500, 50, 500, 0, null, 20),};
 
     public static void main(String[] args) {
         loadDiceImages();
