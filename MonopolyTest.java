@@ -4,7 +4,6 @@
  */
 package monopoly;
 
-import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -18,112 +17,48 @@ import static org.junit.Assert.*;
  * @author Jason
  */
 public class MonopolyTest {
-    
+
     public MonopolyTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of actionPerformed method, of class Monopoly.
-     */
-    @Test
-    public void testActionPerformed() {
-        System.out.println("actionPerformed");
-        ActionEvent e = null;
-        Monopoly instance = new Monopoly();
-        instance.actionPerformed(e);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of upgradeProperty method, of class Monopoly.
-     */
-    @Test
-    public void testUpgradeProperty() {
-        System.out.println("upgradeProperty");
-        Player player = null;
-        int position = 0;
-        Monopoly.upgradeProperty(player, position);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of main method, of class Monopoly.
-     */
-    @Test
-    public void testMain() {
-        System.out.println("main");
-        String[] args = null;
-        Monopoly.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of selectPlayers method, of class Monopoly.
-     */
-    @Test
-    public void testSelectPlayers() {
-        System.out.println("selectPlayers");
-        JFrame frame = null;
-        Monopoly.selectPlayers(frame);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of initGame method, of class Monopoly.
-     */
-    @Test
-    public void testInitGame() {
-        System.out.println("initGame");
-        JFrame frame = null;
-        int numPlayers = 0;
-        Monopoly.initGame(frame, numPlayers);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of updateCurrentPlayerMoney method, of class Monopoly.
-     */
-    @Test
-    public void testUpdateCurrentPlayerMoney() {
-        System.out.println("updateCurrentPlayerMoney");
-        Monopoly.updateCurrentPlayerMoney();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of movePlayer method, of class Monopoly.
-     */
     @Test
     public void testMovePlayer() {
-        System.out.println("movePlayer");
-        int steps = 0;
-        int[] playerPositions = null;
+        System.out.println("testMovePlayer");
+
+        int[] playerPositions = {0, 0, 0};
         int currentPlayer = 0;
+
+        int steps = 1;
         Monopoly.movePlayer(steps, playerPositions, currentPlayer);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
+        assertEquals(1, playerPositions[currentPlayer]);
     }
-    
+
+    @Test
+    public void testInitGame_ValidNumPlayers() {
+        System.out.println("testInitGame_ValidNumPlayers");
+        JFrame frame = new JFrame();
+
+        int expectedNumPlayers = 4;
+        Monopoly.initGame(frame, expectedNumPlayers);
+
+        assertEquals(expectedNumPlayers, Monopoly.players.size());
+    }
+
 }
