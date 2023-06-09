@@ -7,13 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class Game {
 
-    private static int currentPlayer = 0;
+    
 
     public static void removePlayer(ArrayList<Player> players, int playerNum, Property[] properties) {
         // property
@@ -23,17 +25,12 @@ public class Game {
             }
         }
 
-        players.remove(playerNum);
-
-        if (!players.isEmpty()) {
-            currentPlayer = currentPlayer % players.size();
-            players.get(currentPlayer).setHasEndedTurn(false);
-        }
+        players.get(playerNum).getProperty().setMoney(-2);
     }
 
     public static void checkRemovePlayer(ArrayList<Player> players, Property[] properties) {
         for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).getProperty().getMoney() <= 0) {
+            if (players.get(i).getProperty().getMoney() <= 0&&players.get(i).getProperty().getMoney()!=-2) {
                 JFrame lossWindow = new JFrame("Player Lost");
             lossWindow.setSize(300, 200);
             lossWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -52,16 +49,27 @@ public class Game {
     }
 
    
-    public static void checkWinner(ArrayList<Player> players) {
-    // If there's only one player left, they are the winner
-    if (players.size() == 1) {
+   public static void checkWinner(ArrayList<Player> players) {
+    // If there's only one player whose money is more than 0, they are the winner
+    int bankruptPlayers = 0;
+    Player winner = null;
+
+    for (Player player : players) {
+        if (player.getProperty().getMoney() == -2) {
+            bankruptPlayers++;
+        } else {
+            winner = player;
+        }
+    }
+
+    if (bankruptPlayers == players.size()-1) {
         // Create a new JFrame and set its properties
         JFrame winWindow = new JFrame("Winner");
         winWindow.setSize(300, 200);
         winWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Create a JLabel with the win message and add it to the JFrame
-        JLabel winMessage = new JLabel(players.get(0).getName() + " has won!");
+        JLabel winMessage = new JLabel(winner.getName() + " has won!");
         winMessage.setHorizontalAlignment(JLabel.CENTER);
         winWindow.add(winMessage);
 
@@ -71,6 +79,7 @@ public class Game {
         FileIO.incrementGamesPlayed();
     }
 }
+
 
 
    public static void checkTurn(int turns, ArrayList<Player> players, Property[] properties) {
@@ -210,17 +219,18 @@ insertStatement.close();
     }
 }
 
- public static ArrayList<Integer> checkHorseWinners() {
-    ArrayList<Integer> winners = new ArrayList<>();
+ public static Map<Integer, Integer> checkHorseWinners() {
+    Map<Integer, Integer> winners = new HashMap<>();
     String URL = "jdbc:derby:app;create=true";
 
     try (Connection connection = DriverManager.getConnection(URL);
          Statement statement = connection.createStatement();
-         ResultSet resultSet = statement.executeQuery("SELECT horseId FROM Horse")) {
+         ResultSet resultSet = statement.executeQuery("SELECT horseId, gamesWon FROM Horse")) {
 
         while (resultSet.next()) {
             int horseNumber = resultSet.getInt("horseId");
-            winners.add(horseNumber);
+            int gamesWon = resultSet.getInt("gamesWon");
+            winners.put(horseNumber, gamesWon);
         }
 
     } catch (SQLException e) {
@@ -233,7 +243,7 @@ insertStatement.close();
 public static void saveHorseWinners(int winNum) {
     String URL = "jdbc:derby:app;create=true";
     try (Connection connection = DriverManager.getConnection(URL);
-         PreparedStatement statement = connection.prepareStatement("INSERT INTO Horse (horseId) VALUES (?)")) {
+         PreparedStatement statement = connection.prepareStatement("UPDATE Horse SET gamesWon = gamesWon + 1 WHERE horseId = ?")) {
 
         statement.setInt(1, winNum);
         statement.executeUpdate();
@@ -242,7 +252,6 @@ public static void saveHorseWinners(int winNum) {
         e.printStackTrace();
     }
 }
-
 public static void saveGame(ArrayList<Player> players, int id, int currentPlayer) {
     try {
         
