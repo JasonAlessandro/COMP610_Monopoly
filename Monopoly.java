@@ -120,7 +120,7 @@ public static void createAndShowGUI() {
     SwingUtilities.invokeLater(() -> {
         JFrame frame = new JFrame("Monopoly");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 600);
+        frame.setSize(700, 700);
         // Define initial panel
         final JPanel startPanel = new JPanel() {
             @Override
@@ -172,7 +172,7 @@ public static void selectPlayers(JFrame frame) {
     
     
      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 600);
+        frame.setSize(700, 700);
 
         // Define initial panel
         JPanel playerPanel = new JPanel() {
