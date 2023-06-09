@@ -14,7 +14,6 @@ public class Monopoly {
     //buttons
     private static JButton buyPropertyButton = new JButton("Buy Property");
     private static JButton endTurnButton = new JButton("End Turn");
-
     // For dice
     private static int currentDice = 1;
     private static Image[] diceImages = new Image[6];
@@ -34,6 +33,10 @@ public class Monopoly {
     public static int[] playerPositions = new int[]{0, 0, 0, 0};
 
     public static boolean ContinueGame = false;
+
+    static void updateCurrentPlayerMoney(Player player, int i) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
     public void actionPerformed(ActionEvent e) {
         Timer timer = new Timer(100, null);
@@ -71,7 +74,7 @@ public class Monopoly {
         new Property("Bandung", 400, 40, 400, 0, null, 3),
         new Property("Surabaya", 300, 30, 300, 0, null, 4),
         new Property("Medan", 200, 20, 200, 0, null, 5),
-        new Property("Tp1", 0, 0, 0, 0, null, 6),
+        new Property("Horse Race", 0, 0, 0, 0, null, 6),
         new Property("Sydney", 500, 50, 500, 0, null, 7),
         new Property("Canberra", 400, 40, 400, 0, null, 8),
         new Property("Melbourne", 300, 30, 300, 0, null, 9),
@@ -81,7 +84,7 @@ public class Monopoly {
         new Property("Wellington", 300, 30, 300, 0, null, 13),
         new Property("Christchurch", 400, 40, 400, 0, null, 14),
         new Property("Dunedin", 200, 20, 200, 0, null, 15),
-        new Property("Tp2", 0, 0, 0, 0, null, 16),
+        new Property("Teleport", 0, 0, 0, 0, null, 16),
         new Property("Beijing", 300, 30, 300, 0, null, 17),
         new Property("Shanghai", 200, 20, 200, 0, null, 18),
         new Property("Guangzhou", 400, 40, 400, 0, null, 19),
@@ -106,7 +109,7 @@ public class Monopoly {
 
             JOptionPane.showMessageDialog(null, player.getName() + " has upgraded the property " + properties[position].getName() + ".");
             panel.repaint();
-            updateCurrentPlayerLabel();
+            updateCurrentPlayerMoney();
         } else {
             JOptionPane.showMessageDialog(null, player.getName() + " doesn't have enough money to upgrade the property " + properties[position].getName() + ".");
 
@@ -120,8 +123,6 @@ public class Monopoly {
             e.printStackTrace();
         }
 
-        DatabaseConnection.getConnection();
-
         loadDiceImages();
         createAndShowGUI();
     }
@@ -131,7 +132,7 @@ public class Monopoly {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Monopoly");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(700, 700);
+            frame.setSize(620, 640);
             // Define initial panel
             final JPanel startPanel = new JPanel() {
                 @Override
@@ -161,7 +162,7 @@ public class Monopoly {
             startPanel.add(exitButton);
             exitButton.addActionListener(e -> System.exit(0));
 
-            JButton continueButton = new JButton("Continue LastGame");
+            JButton continueButton = new JButton("Continue Last Game");
             continueButton.setBounds(200, 260, 160, 50);
             continueButton.addActionListener(e -> {
                 startPanel.setVisible(false);
@@ -181,7 +182,7 @@ public class Monopoly {
     public static void selectPlayers(JFrame frame) {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(700, 700);
+        frame.setSize(620, 640);
 
         // Define initial panel
         JPanel playerPanel = new JPanel() {
@@ -266,7 +267,7 @@ public class Monopoly {
                 }
             };
 
-            //Go bacl
+            //Go back
             /*JButton returnButton = new JButton("Back");
             returnButton.setBounds(1000, 100, 180, 50); 
             panel.add(returnButton);
@@ -386,9 +387,6 @@ public class Monopoly {
                     rollDiceButton.setEnabled(true);
                     buyPropertyButton.setEnabled(false);
 
-                    turn++;
-                    Game.checkTurn(turn, players, properties);
-
                 }
 
             });
@@ -436,7 +434,7 @@ public class Monopoly {
         if (newPosition >= 20) {
             newPosition -= 20;
             players.get(currentPlayer).getProperty().addMoney(400);
-            updateCurrentPlayerLabel();
+            updateCurrentPlayerMoney();
             JOptionPane.showMessageDialog(
                     null,
                     players.get(currentPlayer).getName() + " passed Start. Player's money increased by 400. New balance: " + players.get(currentPlayer).getProperty().getMoney(),
@@ -497,7 +495,13 @@ public class Monopoly {
                 players.get(playerNum).getProperty().subtractMoney(rent);
                 Game.checkWinner(players);
                 currentProperty.getOwner().getProperty().addMoney(rent);
-                updateCurrentPlayerLabel();
+                JOptionPane.showMessageDialog(
+                        null,
+                        players.get(playerNum).getName() + " has landed on " + currentProperty.getOwner().getName() + "'s property and paid rent of " + rent,
+                        "Pay Rent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                updateCurrentPlayerMoney();
 
             } else {
 
@@ -521,4 +525,5 @@ public class Monopoly {
         }
 
     }
+
 }
