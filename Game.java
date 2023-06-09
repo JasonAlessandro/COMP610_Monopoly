@@ -81,42 +81,42 @@ public class Game {
    
  public static void initializeDatabase(int numPlayer) {
     try {
-        String URL = "jdbc:derby://localhost:1527/Player";
+        String URL = "jdbc:derby:app;create=true";
         Connection connection = DriverManager.getConnection(URL);
         
         // 清空表中的数据
-        String deleteSQL = "DELETE FROM APP.PLAYER";
+        String deleteSQL = "DELETE FROM PLAYER";
         Statement deleteStatement = connection.createStatement();
         deleteStatement.executeUpdate(deleteSQL);
         deleteStatement.close();
 
-       String insertSQL = "INSERT INTO APP.PLAYER (playernum, hasendturn, position, money) VALUES (?, ?, ?, ?)";
+       String insertSQL = "INSERT INTO PLAYER (Playerid, hasendturn, position, money) VALUES (?, ?, ?, ?)";
 PreparedStatement insertStatement = connection.prepareStatement(insertSQL);
 
 for (int i = 1; i <= numPlayer; i++) {
     insertStatement.setInt(1, i);
     insertStatement.setBoolean(2, false);
-    insertStatement.setInt(3, 0); // 设置初始位置为0
-    insertStatement.setInt(4, 1500); // 设置初始金额为1500
+    insertStatement.setInt(3, 0); 
+    insertStatement.setInt(4, 1500); 
     insertStatement.executeUpdate();
 }
 
 for (int i = numPlayer+1; i <= 4; i++) {
     insertStatement.setInt(1, i);
     insertStatement.setBoolean(2, false);
-    insertStatement.setInt(3, 0); // 设置初始位置为0
-    insertStatement.setInt(4, 0); // 设置初始金额为1500
+    insertStatement.setInt(3, 0); 
+    insertStatement.setInt(4, 0); 
     insertStatement.executeUpdate();
 }
 
-// 清空 GAME_STATE 表中的数据
-String deleteGameStateSQL = "DELETE FROM APP.STATE";
+
+String deleteGameStateSQL = "DELETE FROM STATE";
 Statement deleteGameStateStatement = connection.createStatement();
 deleteGameStateStatement.executeUpdate(deleteGameStateSQL);
 deleteGameStateStatement.close();
 
-// 初始化currentPlayer
-String insertGameStateSQL = "INSERT INTO APP.STATE (currentPlayer) VALUES (?)";
+
+String insertGameStateSQL = "INSERT INTO STATE (currentPlayer) VALUES (?)";
 PreparedStatement insertGameStateStatement = connection.prepareStatement(insertGameStateSQL);
 insertGameStateStatement.setInt(1, 1);
 insertGameStateStatement.executeUpdate();
@@ -133,37 +133,188 @@ insertStatement.close();
     }
 }
 
-
-
-public static void saveGame(ArrayList<Player> players, int id,int currentPlayer) {
+ public static void initializeProperties() {
     try {
-        String URL = "jdbc:derby://localhost:1527/Player";
+        String URL = "jdbc:derby:app;create=true";
         Connection connection = DriverManager.getConnection(URL);
-        String updateSQL = "UPDATE APP.PLAYER SET position = ?, hasendturn = ?, money = ? WHERE playernum = ?";
-        PreparedStatement updateStatement = connection.prepareStatement(updateSQL);
+
+       
+        String deleteSQL = "DELETE FROM Lands";
+        Statement deleteStatement = connection.createStatement();
+        deleteStatement.executeUpdate(deleteSQL);
+        deleteStatement.close();
+
         
-        // 对所有玩家进行处理
-        for (Player player : players) {
-            int playerNum = players.indexOf(player);
-            updateStatement.setInt(1, Monopoly.playerPositions[playerNum]);
-            updateStatement.setBoolean(2, player.getHasEndedTurn());
-            updateStatement.setInt(3, player.getProperty().getMoney());
-            updateStatement.setInt(4, playerNum); 
-            updateStatement.executeUpdate();
+        String insertSQL = "INSERT INTO Lands (position, rent, owner, cost,level) VALUES (?, ?, ?, ?,?)";
+        PreparedStatement insertStatement = connection.prepareStatement(insertSQL);
+
+        Property[] properties = new Property[] {
+           new Property("Start", 0, 0, 0, 0, null, 1),
+        new Property("Jakarta", 500, 50, 500, 0, null, 2),
+        new Property("Bandung", 400, 40, 400, 0, null, 3),
+        new Property("Surabaya", 300, 30, 300, 0, null, 4),
+        new Property("Medan", 200, 20, 200, 0, null, 5),
+        new Property("Tp1", 0, 0, 0, 0, null, 6),
+        new Property("Sydney", 500, 50, 500, 0, null, 7),
+        new Property("Canberra", 400, 40, 400, 0, null, 8),
+        new Property("Melbourne", 300, 30, 300, 0, null, 9),
+        new Property("Perth", 200, 20, 200, 0, null, 10),
+        new Property("Casino", 0, 0, 0, 0, null, 11),
+        new Property("Auckland", 500, 50, 500, 0, null, 12),
+        new Property("Wellington", 300, 30, 300, 0, null, 13),
+        new Property("Christchurch", 400, 40, 400, 0, null, 14),
+        new Property("Dunedin", 200, 20, 200, 0, null, 15),
+        new Property("Tp2", 0, 0, 0, 0, null, 16),
+        new Property("Beijing", 300, 30, 300, 0, null, 17),
+        new Property("Shanghai", 200, 20, 200, 0, null, 18),
+        new Property("Guangzhou", 400, 40, 400, 0, null, 19),
+        new Property("Shenzhen", 500, 50, 500, 0, null, 20),
+            
+        };
+
+        for (int i = 0; i < properties.length; i++) {
+            Property property = properties[i];
+            insertStatement.setInt(1, i + 1); 
+            insertStatement.setInt(2, property.getRent()); 
+            insertStatement.setInt(3, 0); 
+            insertStatement.setInt(4, property.getCost());
+            insertStatement.setInt(5, property.getPropertyLevel());
+            insertStatement.executeUpdate();
         }
+
+        insertStatement.close();
+
         
-         // 更新当前玩家的信息
-        String updateCurrentPlayerSQL = "UPDATE APP.STATE SET currentPlayer = ?";
+        connection.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+ public static void saveProperties(int position, int owner, int level) {
+    try {
+        String URL = "jdbc:derby:app;create=true";
+        Connection connection = DriverManager.getConnection(URL);
+        String updateSQL = "UPDATE Lands SET owner = ?, level = ? WHERE position = ?";
+        PreparedStatement updateStatement = connection.prepareStatement(updateSQL);
+
+        updateStatement.setInt(1, owner);
+        updateStatement.setInt(2, level);
+        updateStatement.setInt(3, position);
+        updateStatement.executeUpdate();
+
+        updateStatement.close();
+        connection.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+ public static ArrayList<Integer> checkHorseWinners() {
+    ArrayList<Integer> winners = new ArrayList<>();
+    String URL = "jdbc:derby:app;create=true";
+
+    try (Connection connection = DriverManager.getConnection(URL);
+         Statement statement = connection.createStatement();
+         ResultSet resultSet = statement.executeQuery("SELECT horseId FROM Horse")) {
+
+        while (resultSet.next()) {
+            int horseNumber = resultSet.getInt("horseId");
+            winners.add(horseNumber);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return winners;
+}
+
+public static void saveHorseWinners(int winNum) {
+    String URL = "jdbc:derby:app;create=true";
+    try (Connection connection = DriverManager.getConnection(URL);
+         PreparedStatement statement = connection.prepareStatement("INSERT INTO Horse (horseId) VALUES (?)")) {
+
+        statement.setInt(1, winNum);
+        statement.executeUpdate();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+public static void saveGame(ArrayList<Player> players, int id, int currentPlayer) {
+    try {
+        
+         System.out.println("Saving game:");
+    System.out.println("id = " + id);
+    System.out.println("Number of players: " + players.size());
+    System.out.println("Number of player positions: " + Monopoly.playerPositions.length);
+    
+        String URL = "jdbc:derby:app;create=true";
+        Connection connection = DriverManager.getConnection(URL);
+        String updateSQL = "UPDATE PLAYER SET position = ?, hasendturn = ?, money = ? WHERE playerid = ?";
+        PreparedStatement updateStatement = connection.prepareStatement(updateSQL);
+
+        Player player = players.get(id-1);
+        updateStatement.setInt(1, Monopoly.playerPositions[id-1]);
+        updateStatement.setBoolean(2, player.getHasEndedTurn());
+        updateStatement.setInt(3, player.getProperty().getMoney());
+        updateStatement.setInt(4, id);  
+        updateStatement.executeUpdate();
+
+        
+        String updateCurrentPlayerSQL = "UPDATE STATE SET currentPlayer = ?";
         PreparedStatement updateCurrentPlayerStatement = connection.prepareStatement(updateCurrentPlayerSQL);
-        updateCurrentPlayerStatement.setInt(1, currentPlayer); 
+        updateCurrentPlayerStatement.setInt(1, currentPlayer+1); 
+        
         updateCurrentPlayerStatement.executeUpdate();
 
         updateStatement.close();
         updateCurrentPlayerStatement.close();
-        updateStatement.close();
 
-        // 关闭连接
+        
         connection.close();
+    } catch (SQLException e) {
+        System.out.println("SQLException: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+public static void continueProperty(Property[] properties,ArrayList<Player> players) {
+    try {
+        String URL = "jdbc:derby:app;create=true";
+        Connection connection = DriverManager.getConnection(URL);
+        
+        String selectSQL = "SELECT * FROM LANDS";
+        Statement selectStatement = connection.createStatement();
+        ResultSet resultSet = selectStatement.executeQuery(selectSQL);
+        
+        while (resultSet.next()) {
+            int position = resultSet.getInt("position");
+            int level = resultSet.getInt("level");
+            int cost = resultSet.getInt("cost");
+            int owner = resultSet.getInt("owner");
+            int rent = resultSet.getInt("rent");
+            
+            Property property = properties[position - 1];  
+            property.setPropertyLevel(level);
+            property.setCost(cost);
+            
+           if (owner > 0 && owner <= players.size()) {
+                Player player = players.get(owner - 1);
+                property.setOwner(player);
+            } else {
+                property.setOwner(null);
+            }
+            property.setRent(rent);
+        }
+        
+        resultSet.close();
+        selectStatement.close();
+        connection.close();
+        
+        System.out.println("Property data has been successfully loaded from the database.");
     } catch (SQLException e) {
         System.out.println("SQLException: " + e.getMessage());
         e.printStackTrace();
@@ -172,55 +323,66 @@ public static void saveGame(ArrayList<Player> players, int id,int currentPlayer)
 
 
 
+
+
 public static void continuePlaying() {
     try {
-        // 连接数据库
-        String URL = "jdbc:derby://localhost:1527/Player";
+        
+        String URL = "jdbc:derby:app;create=true";
         Connection connection = DriverManager.getConnection(URL);
 
-        // 查询并加载玩家数据
-        // 查询并加载玩家数据
-        String query = "SELECT * FROM APP.PLAYER"; // 根据你的数据库表名修改查询语句
+        
+        String query = "SELECT * FROM APP.PLAYER";
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
 
-    // 处理查询结果，更新游戏状态
+    
         for (int i = 0; i < 4; i++) {
         int playerNum = i + 1;
 
-    // 查询特定玩家的数据
-    String playerQuery = "SELECT * FROM APP.PLAYER WHERE PlayerNum = " + playerNum; // 根据你的数据库表名和列名修改查询语句
+    
+    String playerQuery = "SELECT * FROM PLAYER WHERE Playerid = " + playerNum; 
     ResultSet playerResultSet = statement.executeQuery(playerQuery);
 
-    // 检查查询结果是否有效
+    
     if (playerResultSet.next()) {
         int playerMoney = playerResultSet.getInt("money");
         int playerPosition = playerResultSet.getInt("Position");
          boolean hasEndTurn = playerResultSet.getBoolean("HasEndTurn");
 
-        // 根据玩家数据创建Player对象并添加到players列表
+        
         Player player = new Player("Player " + playerNum, Monopoly.playerColors[i], playerMoney,hasEndTurn,playerNum);
         Monopoly.players.add(player);
 
-        // 更新玩家位置
+       
         Monopoly.playerPositions[i] = playerPosition;
     } else {
-        // 玩家数据不存在或无效，从游戏中移除该玩家
+       
         Monopoly.players.remove(i);
         Monopoly.playerPositions[i] = 0;
     }
     
-    String currentPlayerQuery = "SELECT currentPlayer FROM APP.STATE";
+    String currentPlayerQuery = "SELECT currentPlayer FROM STATE";
 ResultSet currentPlayerResultSet = statement.executeQuery(currentPlayerQuery);
 if (currentPlayerResultSet.next()) {
-    Monopoly.currentPlayer = currentPlayerResultSet.getInt("currentPlayer");
+    int currentRound;
+           currentRound=currentPlayerResultSet.getInt("currentPlayer");
+           if(currentRound >3)
+           {
+               Monopoly.currentPlayer = 0;
+           }
+           else
+           {
+               Monopoly.currentPlayer =currentRound;
+           }
+          
 }
 
-    // 关闭玩家查询结果集
+  
     playerResultSet.close();
 }
 
-// 关闭连接
+
 resultSet.close();
 statement.close();
 connection.close();
@@ -231,6 +393,8 @@ connection.close();
         e.printStackTrace();
     }
 }
+
+
    
 
 }
