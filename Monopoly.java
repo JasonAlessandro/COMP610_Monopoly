@@ -102,16 +102,27 @@ public class Monopoly {
 
 
     public static void main(String[] args) {
-        loadDiceImages();
+        try {
+    Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+} catch (ClassNotFoundException e) {
+    e.printStackTrace();
+}
 
-        //Creat a window ask players to type the number of players
-        SwingUtilities.invokeLater(() -> {
+
+        DatabaseConnection.getConnection();
+         
+    loadDiceImages();
+    createAndShowGUI();
+}
+
+public static void createAndShowGUI() {
+    // Create a window asking players to type the number of players
+    SwingUtilities.invokeLater(() -> {
         JFrame frame = new JFrame("Monopoly");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
-
         // Define initial panel
-        JPanel startPanel = new JPanel() {
+        final JPanel startPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -156,6 +167,7 @@ public class Monopoly {
         frame.setVisible(true);
     });
 }
+
 public static void selectPlayers(JFrame frame) {
     
     
@@ -175,6 +187,8 @@ public static void selectPlayers(JFrame frame) {
                 }
             }
         };
+        
+        
 
     playerPanel.setLayout(null);
     int buttonX = 180; 
@@ -206,6 +220,7 @@ public static void initGame(JFrame frame, int numPlayers) {
     if(ContinueGame == true)
     {
         Game.continuePlaying();
+        Game.continueProperty(properties,players);
         Game.checkRemovePlayer(players,properties);
     }else
     {
@@ -242,13 +257,33 @@ public static void initGame(JFrame frame, int numPlayers) {
                         g.drawImage(board, 0, 0, this);
 
                         // draw players
-                        Draw.drawPlayersAndProperty(g, playerPositions, players);
+                        Draw.drawPlayers(g, playerPositions, players);
+                        Draw.drawProperties(g,properties);
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             };
+            
+            //Go bacl
+            /*JButton returnButton = new JButton("Back");
+            returnButton.setBounds(1000, 100, 180, 50); 
+            panel.add(returnButton);
+            returnButton.addActionListener(e -> {
+  
+                         // Remove game panel
+                    frame.getContentPane().removeAll();
+
+                // Revalidate and repaint the frame
+                frame.revalidate();
+                    frame.repaint();
+
+                    
+
+                         createAndShowGUI();
+                        });
+*/
 
             //End Turn
             endTurnButton.setBounds(1000, 450, 100, 50);
@@ -276,6 +311,8 @@ public static void initGame(JFrame frame, int numPlayers) {
                             players.get(currentPlayer).addProperty(currentPosition);
                             properties[currentPosition].setPropertyLevel(1);
                             Game.saveProperties(currentPosition+1,players.get(currentPlayer).id,1);
+                            panel.repaint();
+                            
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "You don't have enough money to buy " + currentProperty.getName() + ".", "Error", JOptionPane.ERROR_MESSAGE);
@@ -342,13 +379,18 @@ public static void initGame(JFrame frame, int numPlayers) {
                     
                     Game.saveGame(players,players.get(currentPlayer).id,currentPlayer);
                     Game.checkWinner(players);
-                    currentPlayer = (currentPlayer + 1) % players.size();
-                    updateCurrentPlayerLabel();
-                    rollDiceButton.setEnabled(true);
-                    buyPropertyButton.setEnabled(false);
+                    do {
+            currentPlayer = (currentPlayer + 1) % players.size();
+        } while (players.get(currentPlayer).getProperty().getMoney() <= 0);
+        
+        updateCurrentPlayerLabel();
+        rollDiceButton.setEnabled(true);
+        buyPropertyButton.setEnabled(false);
+        
+        turn++;
+        Game.checkTurn(turn, players, properties);
                     
-                    turn++;
-                    Game.checkTurn(turn, players, properties);
+                   
                     
                     
 
@@ -398,7 +440,7 @@ public static void initGame(JFrame frame, int numPlayers) {
         int newPosition = playerPositions[currentPlayer] + steps;
         if (newPosition >= 20) {
             newPosition -= 20;
-            players.get(currentPlayer).getProperty().addMoney(400);
+            players.get(currentPlayer).getProperty().addMoney(-400);
             System.out.println(players.get(currentPlayer).getName() + " passed Start. Player's money increased by 400. New balance: " + players.get(currentPlayer).getProperty().getMoney());
         }
         playerPositions[currentPlayer] = newPosition;
@@ -467,7 +509,8 @@ public static void initGame(JFrame frame, int numPlayers) {
                 );
 
                 if (choice == JOptionPane.YES_OPTION) {
-                    upgradeProperty(players.get(currentPlayer),players.get(currentPlayer).getPosition());
+                    upgradeProperty(players.get(currentPlayer),cellIndex-1);
+                    panel.repaint();
                     Game.saveProperties(players.get(currentPlayer).getPosition(),players.get(currentPlayer).id,properties[players.get(currentPlayer).getPosition()].getPropertyLevel());
                 }else {
                     JOptionPane.getRootFrame().dispose();
