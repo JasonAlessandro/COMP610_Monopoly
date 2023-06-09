@@ -13,7 +13,8 @@ public class Player {
     private boolean hasEndedTurn;
     private HashSet<Integer> ownedProperties;
 
-    public Player(String name, Color color, int startingMoney,boolean hasEndedTurn,int id) {
+    //Constructors and Get Set methods
+    public Player(String name, Color color, int startingMoney, boolean hasEndedTurn, int id) {
         this.name = name;
         this.color = color;
         this.position = 0;
@@ -62,7 +63,5 @@ public class Player {
     public void addProperty(int position) {
         ownedProperties.add(position);
     }
-    
-    
 
 }
