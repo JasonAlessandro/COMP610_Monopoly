@@ -9,8 +9,9 @@ public class Property {
     private int cellAddress;
     private int propertyLevel;
     private int upgradeCost;
-    
-    public Property(String name, int cost, int rent,int upgradeCost,int propertyLevel, Player owner, int cellAddress) {
+
+    //Constructor and Get Set methods
+    public Property(String name, int cost, int rent, int upgradeCost, int propertyLevel, Player owner, int cellAddress) {
         this.name = name;
         this.cost = cost;
         this.rent = rent;
@@ -28,10 +29,15 @@ public class Property {
         return cost;
     }
 
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+
     public int getRent() {
         return rent;
     }
-    public void setRent(int rent){
+
+    public void setRent(int rent) {
         this.rent = rent;
     }
 
@@ -46,8 +52,8 @@ public class Property {
     public int getCellAddress() {
         return cellAddress;
     }
-    
-     public int getUpgradeCost() {
+
+    public int getUpgradeCost() {
         return upgradeCost;
     }
 
@@ -58,7 +64,5 @@ public class Property {
     public void setPropertyLevel(int propertyLevel) {
         this.propertyLevel = propertyLevel;
     }
-    
-     
 
 }
