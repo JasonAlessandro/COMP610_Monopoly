@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -81,10 +82,10 @@ public class Board {
     winnersFrame.setSize(300, 400);
     winnersFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-    ArrayList<Integer> previousWinners = Game.checkHorseWinners();
+    Map<Integer, Integer> previousWinners = Game.checkHorseWinners();
     StringBuilder winnersMessage = new StringBuilder("Previous Winners:\n");
-    for (Integer winner : previousWinners) {
-        winnersMessage.append("Horse ").append(winner).append(" has won.\n");
+    for (Map.Entry<Integer, Integer> entry : previousWinners.entrySet()) {
+        winnersMessage.append("Horse ").append(entry.getKey()).append(" has won ").append(entry.getValue()).append(" times.\n");
     }
 
     JTextArea winnersTextArea = new JTextArea(winnersMessage.toString());
@@ -94,6 +95,7 @@ public class Board {
     winnersFrame.add(scrollPane);
     winnersFrame.setVisible(true);
 });
+
 
 
     
