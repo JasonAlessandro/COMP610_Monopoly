@@ -1,4 +1,4 @@
-package com.mycompany.monopoly;
+package monopoly;
 
 import java.awt.Image;
 import java.io.File;
@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class Board {
 
@@ -58,7 +60,7 @@ public class Board {
 
    try {
     
-    Image img = ImageIO.read(new File("horses.png"));
+    Image img = ImageIO.read(new File("pictures/horses.png"));
     ImageIcon icon = new ImageIcon(img);
     JLabel horseLabel = new JLabel(icon);
 
@@ -70,7 +72,28 @@ public class Board {
     e.printStackTrace();
 }
 
+ JButton showWinnersButton = new JButton("Show Previous Winners");
+        showWinnersButton.setBounds(50, 800, 180, 50);
+        horsePanel.add(showWinnersButton);
 
+        showWinnersButton.addActionListener(e -> {
+    JFrame winnersFrame = new JFrame("Previous Winners");
+    winnersFrame.setSize(300, 400);
+    winnersFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+    ArrayList<Integer> previousWinners = Game.checkHorseWinners();
+    StringBuilder winnersMessage = new StringBuilder("Previous Winners:\n");
+    for (Integer winner : previousWinners) {
+        winnersMessage.append("Horse ").append(winner).append(" has won.\n");
+    }
+
+    JTextArea winnersTextArea = new JTextArea(winnersMessage.toString());
+    winnersTextArea.setEditable(false);
+
+    JScrollPane scrollPane = new JScrollPane(winnersTextArea);
+    winnersFrame.add(scrollPane);
+    winnersFrame.setVisible(true);
+});
 
 
     
@@ -108,15 +131,16 @@ public class Board {
 
     
     if (winningHorseIndex == finalI - 1) {
-        int winnings = (int) (bet * horses[finalI - 1].getPayoutRatio());
-        players.get(currentPlayer).getProperty().addMoney(winnings);
-        JOptionPane.showMessageDialog(horseFrame, "You won! You gained $" + winnings);
-        Monopoly.updateCurrentPlayerMoney();
-    } else {
-        players.get(currentPlayer).getProperty().subtractMoney(bet);
-        JOptionPane.showMessageDialog(horseFrame, "You lost. You lost $" + bet);
-        Monopoly.updateCurrentPlayerMoney();
-    }
+    int winnings = (int) (bet * horses[finalI - 1].getPayoutRatio());
+    players.get(currentPlayer).getProperty().addMoney(winnings);
+    JOptionPane.showMessageDialog(horseFrame, "You won! Horse " + (winningHorseIndex + 1) + " won the race. You gained $" + winnings);
+    Monopoly.updateCurrentPlayerMoney();
+} else {
+    players.get(currentPlayer).getProperty().subtractMoney(bet);
+    JOptionPane.showMessageDialog(horseFrame, "You lost. Horse " + (winningHorseIndex + 1) + " won the race. You lost $" + bet);
+    Monopoly.updateCurrentPlayerMoney();
+}
+ Game.saveHorseWinners(winningHorseIndex + 1);
 
 
               
@@ -134,4 +158,3 @@ public class Board {
 }
     }
 }
-
