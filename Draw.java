@@ -42,25 +42,29 @@ public class Draw {
     };
 
     public static void drawPlayers(Graphics g, int[] playerPositions, ArrayList<Player> players) {
+        // Draws the players on the game board using their positions and colors.
 
         for (int i = 0; i < players.size(); i++) {
-            int positionIndex = playerPositions[i];
-            int startX = playerPositionsCoordinates[i][positionIndex][0];
-            int startY = playerPositionsCoordinates[i][positionIndex][1];
+            if (players.get(i).getProperty().getMoney() > 0) {
+                int positionIndex = playerPositions[i];
+                int startX = playerPositionsCoordinates[i][positionIndex][0];
+                int startY = playerPositionsCoordinates[i][positionIndex][1];
 
-            g.setColor(players.get(i).getColor());
-            g.fillOval(startX, startY - 2, 7, 7);
-            g.fillRect(startX + 1, startY + 5, 5, 7);
+                g.setColor(players.get(i).getColor());
+                g.fillOval(startX, startY - 2, 7, 7);
+                g.fillRect(startX + 1, startY + 5, 5, 7);
 
-            //Outline
-            g.setColor(Color.BLACK);
-            g.drawOval(startX, startY - 2, 7, 7);
-            g.drawRect(startX + 1, startY + 5, 5, 7);
+                //Outline
+                g.setColor(Color.BLACK);
+                g.drawOval(startX, startY - 2, 7, 7);
+                g.drawRect(startX + 1, startY + 5, 5, 7);
+            }
         }
 
     }
 
     public static void drawProperties(Graphics g, Property[] properties) {
+        // Draws the properties on the game board based on their ownership and property level.
         for (int propertyIndex = 0; propertyIndex < properties.length; propertyIndex++) {
             int x = propertyCoordinates[propertyIndex][0];
             int y = propertyCoordinates[propertyIndex][1];
@@ -69,43 +73,33 @@ public class Draw {
             if (property.getOwner() != null) {
 
                 int propertyLevel = property.getPropertyLevel();
-                // Define the x-coordinates and y-coordinates for the triangle's vertices
                 int[] xPoints = {x + 3, x, x + 6};
                 int[] yPoints = {y, y + 10, y + 10};
 
                 switch (propertyLevel) {
                     case 1:
-                        // Draw the outline of the triangle
                         g.setColor(Color.BLACK);
                         g.drawPolygon(xPoints, yPoints, 3);
 
-                        // Fill the triangle with color
                         g.setColor(playerColors[property.getOwner().id - 1]);
                         g.fillPolygon(xPoints, yPoints, 3);
                         break;
                     case 2:
-                        // Draw the outline of the triangle
                         g.setColor(Color.BLACK);
                         g.drawPolygon(xPoints, yPoints, 3);
 
-                        // Fill the triangle with color
                         g.setColor(playerColors[property.getOwner().id - 1]);
                         g.fillPolygon(xPoints, yPoints, 3);
                         g.fillRect(x, y + 11, 7, 10);
                         break;
                     case 3:
-                        int size = 10; // Size of the square
-                        int rectWidth = 10; // Width of the rectangles
-                        int rectHeight = size * 2; // Height of the rectangles
+                        int size = 10; 
+                        int rectWidth = 10; 
+                        int rectHeight = size * 2; 
 
-                        // Draw the square
                         g.setColor(playerColors[property.getOwner().id - 1]);
                         g.fillRect(x + 5, y + 10, size, size);
-
-                        // Draw the left rectangle
                         g.fillRect(x + 5 - rectWidth, y, rectWidth, rectHeight);
-
-                        // Draw the right rectangle
                         g.fillRect(x + 5 + size, y, rectWidth, rectHeight);
                         break;
                     default:
