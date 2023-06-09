@@ -14,6 +14,7 @@ public class Monopoly {
     //buttons
     private static JButton buyPropertyButton = new JButton("Buy Property");
     private static JButton endTurnButton = new JButton("End Turn");
+
     // For dice
     private static int currentDice = 1;
     private static Image[] diceImages = new Image[6];
@@ -31,9 +32,8 @@ public class Monopoly {
 
     //Positions
     public static int[] playerPositions = new int[]{0, 0, 0, 0};
-    
+
     public static boolean ContinueGame = false;
-    
 
     public void actionPerformed(ActionEvent e) {
         Timer timer = new Timer(100, null);
@@ -53,7 +53,7 @@ public class Monopoly {
 
                 if (rollIndex[0] >= diceRolls.length - 1) {
                     timer.stop();
-                    
+
                 } else {
                     rollIndex[0]++;
                 }
@@ -86,92 +86,101 @@ public class Monopoly {
         new Property("Shanghai", 200, 20, 200, 0, null, 18),
         new Property("Guangzhou", 400, 40, 400, 0, null, 19),
         new Property("Shenzhen", 500, 50, 500, 0, null, 20),};
-    
-   public static void upgradeProperty(Player player, int position) {
-    if (player.getProperty().getMoney() >= properties[position].getUpgradeCost()) {
-        player.getProperty().subtractMoney(properties[position].getUpgradeCost());
-        
-        properties[position].setPropertyLevel(properties[position].getPropertyLevel()+1);
-        properties[position].setRent(properties[position].getRent()*2);
-        
-        System.out.println(player.getName() + " has upgraded the property " + properties[position].getName() + ".");
-    } else {
-        System.out.println(player.getName() + " doesn't have enough money to upgrade the property " + properties[position].getName() + ".");
-    }
-}
 
+    public static void upgradeProperty(Player player, int position) {
+        if (properties[position].getPropertyLevel() == 3) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The property " + properties[position].getName() + " is already at its maximum level.",
+                    "Maximum Level Reached",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (player.getProperty().getMoney() >= properties[position].getUpgradeCost()) {
+            player.getProperty().subtractMoney(properties[position].getUpgradeCost());
+
+            properties[position].setPropertyLevel(properties[position].getPropertyLevel() + 1);
+            properties[position].setRent(properties[position].getRent() * 2);
+
+            JOptionPane.showMessageDialog(null, player.getName() + " has upgraded the property " + properties[position].getName() + ".");
+            panel.repaint();
+            updateCurrentPlayerLabel();
+        } else {
+            JOptionPane.showMessageDialog(null, player.getName() + " doesn't have enough money to upgrade the property " + properties[position].getName() + ".");
+
+        }
+    }
 
     public static void main(String[] args) {
         try {
-    Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-} catch (ClassNotFoundException e) {
-    e.printStackTrace();
-}
-
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         DatabaseConnection.getConnection();
-         
-    loadDiceImages();
-    createAndShowGUI();
-}
 
-public static void createAndShowGUI() {
-    // Create a window asking players to type the number of players
-    SwingUtilities.invokeLater(() -> {
-        JFrame frame = new JFrame("Monopoly");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(700, 700);
-        // Define initial panel
-        final JPanel startPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                try {
-                    Image background = ImageIO.read(new File("pictures/Monopoly_start.png"));
-                    g.drawImage(background, 0, 0, this);
-                } catch (IOException e) {
-                    e.printStackTrace();
+        loadDiceImages();
+        createAndShowGUI();
+    }
+
+    public static void createAndShowGUI() {
+        // Create a window asking players to type the number of players
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Monopoly");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(700, 700);
+            // Define initial panel
+            final JPanel startPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    try {
+                        Image background = ImageIO.read(new File("pictures/monopoly_start.png"));
+                        g.drawImage(background, 0, 0, this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        };
-        
-        startPanel.setLayout(null);
-        // Define start and exit buttons
-        JButton startButton = new JButton("Start Game");
-        startButton.setBounds(200, 200, 160, 50); 
-        startPanel.add(startButton);
-        startButton.addActionListener(e -> {
-            startPanel.setVisible(false);
-            selectPlayers(frame);
+            };
+
+            startPanel.setLayout(null);
+            // Define start and exit buttons
+            JButton startButton = new JButton("Start Game");
+            startButton.setBounds(200, 200, 160, 50);
+            startPanel.add(startButton);
+            startButton.addActionListener(e -> {
+                startPanel.setVisible(false);
+                selectPlayers(frame);
+            });
+
+            JButton exitButton = new JButton("Exit Game");
+            exitButton.setBounds(200, 320, 160, 50);
+            startPanel.add(exitButton);
+            exitButton.addActionListener(e -> System.exit(0));
+
+            JButton continueButton = new JButton("Continue LastGame");
+            continueButton.setBounds(200, 260, 160, 50);
+            continueButton.addActionListener(e -> {
+                startPanel.setVisible(false);
+                ContinueGame = true;
+                initGame(frame, 4);
+            });
+
+            startPanel.add(continueButton);
+            startPanel.add(startButton);
+            startPanel.add(exitButton);
+
+            frame.add(startPanel);
+            frame.setVisible(true);
         });
+    }
 
-        JButton exitButton = new JButton("Exit Game");
-        exitButton.setBounds(200, 320, 160, 50); 
-        startPanel.add(exitButton);
-        exitButton.addActionListener(e -> System.exit(0));
-        
-        JButton continueButton = new JButton("Continue LastGame");
-        continueButton.setBounds(200, 260, 160, 50);
-        continueButton.addActionListener(e -> {
-            startPanel.setVisible(false);
-            ContinueGame = true;
-             initGame(frame, 4);
-        });
-        
-        
-        startPanel.add(continueButton);
-        startPanel.add(startButton);
-        startPanel.add(exitButton);
+    public static void selectPlayers(JFrame frame) {
 
-        frame.add(startPanel);
-        frame.setVisible(true);
-    });
-}
-
-public static void selectPlayers(JFrame frame) {
-    
-    
-     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(700, 700);
 
         // Define initial panel
@@ -187,64 +196,55 @@ public static void selectPlayers(JFrame frame) {
                 }
             }
         };
-        
-        
 
-    playerPanel.setLayout(null);
-    int buttonX = 180; 
-    int buttonY = 200;
-    
-    for (int i = 2; i <= 4; i++) {
-    JButton playerButton = new JButton(i + " Players");
-    int finalI = i;
-    playerButton.addActionListener(e -> {
-        playerPanel.setVisible(false);
-        initGame(frame, finalI);
-    });
-    
-    playerButton.setBounds(buttonX, buttonY, 180, 50); 
-    buttonY += 75; 
-    playerPanel.add(playerButton);
-}
+        playerPanel.setLayout(null);
+        int buttonX = 180;
+        int buttonY = 200;
 
-    frame.add(playerPanel);
-    playerPanel.setVisible(true);
-}
+        for (int i = 2; i <= 4; i++) {
+            JButton playerButton = new JButton(i + " Players");
+            int finalI = i;
+            playerButton.addActionListener(e -> {
+                playerPanel.setVisible(false);
+                initGame(frame, finalI);
+            });
 
-public static void initGame(JFrame frame, int numPlayers) {
-    players = new ArrayList<>();
+            playerButton.setBounds(buttonX, buttonY, 180, 50);
+            buttonY += 75;
+            playerPanel.add(playerButton);
+        }
 
-    
-    
-    
-    if(ContinueGame == true)
-    {
-        Game.continuePlaying();
-        Game.continueProperty(properties,players);
-        Game.checkRemovePlayer(players,properties);
-    }else
-    {
-        
-        for (int i = 0; i < numPlayers; i++) {
-        String name = "Player " + (i + 1);
-        players.add(new Player(name, playerColors[i], 1500,false,i+1));
+        frame.add(playerPanel);
+        playerPanel.setVisible(true);
     }
 
-    playerPositions = new int[numPlayers];
-    for (int i = 0; i < numPlayers; i++) {
-        playerPositions[i] = players.get(i).getPosition();
-    }
-    Game.initializeDatabase(numPlayers);
-    Game.initializeProperties();
-    }
-    
-    frame.getContentPane().removeAll();
-    frame.repaint();
-    
-      
+    public static void initGame(JFrame frame, int numPlayers) {
+        players = new ArrayList<>();
+
+        if (ContinueGame == true) {
+            Game.continuePlaying();
+            Game.continueProperty(properties, players);
+            Game.checkRemovePlayer(players, properties);
+        } else {
+
+            for (int i = 0; i < numPlayers; i++) {
+                String name = "Player " + (i + 1);
+                players.add(new Player(name, playerColors[i], 1500, false, i + 1));
+            }
+
+            playerPositions = new int[numPlayers];
+            for (int i = 0; i < numPlayers; i++) {
+                playerPositions[i] = players.get(i).getPosition();
+            }
+            Game.initializeDatabase(numPlayers);
+            Game.initializeProperties();
+        }
+
+        frame.getContentPane().removeAll();
+        frame.repaint();
 
         SwingUtilities.invokeLater(() -> {
-           
+
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1200, 700);
 
@@ -258,14 +258,14 @@ public static void initGame(JFrame frame, int numPlayers) {
 
                         // draw players
                         Draw.drawPlayers(g, playerPositions, players);
-                        Draw.drawProperties(g,properties);
+                        Draw.drawProperties(g, properties);
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             };
-            
+
             //Go bacl
             /*JButton returnButton = new JButton("Back");
             returnButton.setBounds(1000, 100, 180, 50); 
@@ -283,8 +283,7 @@ public static void initGame(JFrame frame, int numPlayers) {
 
                          createAndShowGUI();
                         });
-*/
-
+             */
             //End Turn
             endTurnButton.setBounds(1000, 450, 100, 50);
             endTurnButton.setEnabled(false);
@@ -307,12 +306,12 @@ public static void initGame(JFrame frame, int numPlayers) {
                             panel.repaint();
                             JOptionPane.showMessageDialog(null, "You have bought " + currentProperty.getName() + " for $" + price + ".", "Success", JOptionPane.INFORMATION_MESSAGE);
                             buyPropertyButton.setEnabled(false);
-                             updateCurrentPlayerMoney();
+                            updateCurrentPlayerMoney();
                             players.get(currentPlayer).addProperty(currentPosition);
                             properties[currentPosition].setPropertyLevel(1);
-                            Game.saveProperties(currentPosition+1,players.get(currentPlayer).id,1);
+                            Game.saveProperties(currentPosition + 1, players.get(currentPlayer).id, 1);
                             panel.repaint();
-                            
+
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "You don't have enough money to buy " + currentProperty.getName() + ".", "Error", JOptionPane.ERROR_MESSAGE);
@@ -376,23 +375,19 @@ public static void initGame(JFrame frame, int numPlayers) {
                     JOptionPane.showMessageDialog(null, "You have already ended your turn!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     players.get(currentPlayer).setHasEndedTurn(true);
-                    
-                    Game.saveGame(players,players.get(currentPlayer).id,currentPlayer);
+
+                    Game.saveGame(players, players.get(currentPlayer).id, currentPlayer);
                     Game.checkWinner(players);
                     do {
-            currentPlayer = (currentPlayer + 1) % players.size();
-        } while (players.get(currentPlayer).getProperty().getMoney() <= 0);
-        
-        updateCurrentPlayerLabel();
-        rollDiceButton.setEnabled(true);
-        buyPropertyButton.setEnabled(false);
-        
-        turn++;
-        Game.checkTurn(turn, players, properties);
-                    
-                   
-                    
-                    
+                        currentPlayer = (currentPlayer + 1) % players.size();
+                    } while (players.get(currentPlayer).getProperty().getMoney() <= 0);
+
+                    updateCurrentPlayerLabel();
+                    rollDiceButton.setEnabled(true);
+                    buyPropertyButton.setEnabled(false);
+
+                    turn++;
+                    Game.checkTurn(turn, players, properties);
 
                 }
 
@@ -409,7 +404,7 @@ public static void initGame(JFrame frame, int numPlayers) {
             panel.add(endTurnButton);
 
             JPanel bottomPanel = new JPanel();
-            bottomPanel.add(rollDiceButton);  
+            bottomPanel.add(rollDiceButton);
             bottomPanel.add(rollResultLabel);
 
             frame.add(panel, BorderLayout.CENTER);
@@ -428,20 +423,26 @@ public static void initGame(JFrame frame, int numPlayers) {
         endTurnButton.setEnabled(false);
 
     }
-    
+
     public static void updateCurrentPlayerMoney() {
 
         currentPlayerLabel.setText("Current Round: " + players.get(currentPlayer).getName() + " - $" + players.get(currentPlayer).getProperty().getMoney());
         currentPlayerLabel.setForeground(players.get(currentPlayer).getColor());
-     }
+    }
 
     public static void movePlayer(int steps, int[] playerPositions, int currentPlayer) {
 
         int newPosition = playerPositions[currentPlayer] + steps;
         if (newPosition >= 20) {
             newPosition -= 20;
-            players.get(currentPlayer).getProperty().addMoney(-400);
-            System.out.println(players.get(currentPlayer).getName() + " passed Start. Player's money increased by 400. New balance: " + players.get(currentPlayer).getProperty().getMoney());
+            players.get(currentPlayer).getProperty().addMoney(400);
+            updateCurrentPlayerLabel();
+            JOptionPane.showMessageDialog(
+                    null,
+                    players.get(currentPlayer).getName() + " passed Start. Player's money increased by 400. New balance: " + players.get(currentPlayer).getProperty().getMoney(),
+                    "Pass Start",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         }
         playerPositions[currentPlayer] = newPosition;
         handleCellAction(currentPlayer, newPosition + 1);
@@ -459,7 +460,7 @@ public static void initGame(JFrame frame, int numPlayers) {
     }
 
     private static void handleCellAction(int playerNum, int cellIndex) {
-         if (cellIndex == 1) {
+        if (cellIndex == 1) {
             // Start
             buyPropertyButton.setEnabled(false);
 
@@ -468,27 +469,26 @@ public static void initGame(JFrame frame, int numPlayers) {
             buyPropertyButton.setEnabled(false);
             Board.casino(players, currentPlayer);
             Game.checkWinner(players);
-            
-         } else if (cellIndex == 6) {
 
-         buyPropertyButton.setEnabled(false);
-         Board.horseRace(players, currentPlayer);
-         
+        } else if (cellIndex == 6) {
+
+            buyPropertyButton.setEnabled(false);
+            Board.horseRace(players, currentPlayer);
 
         } else if (cellIndex == 16) {
-             Random random = new Random();
-         int newPosition = random.nextInt(20) + 1;
-    
+            Random random = new Random();
+            int newPosition = random.nextInt(20) + 1;
+
             // Move the player to the new position
             movePlayer(newPosition, playerPositions, currentPlayer);
             buyPropertyButton.setEnabled(false);
-    
+
             // Display the message
-             String message = players.get(currentPlayer).getName() + " has been teleported to " + properties[playerPositions[currentPlayer]].getName();
+            String message = players.get(currentPlayer).getName() + " has been teleported to " + properties[playerPositions[currentPlayer]].getName();
             JOptionPane.showMessageDialog(null, message);
 
         } else {
-            Property currentProperty = properties[(cellIndex - 1)%20];
+            Property currentProperty = properties[(cellIndex - 1) % 20];
 
             if (currentProperty.getOwner() == null) {
                 buyPropertyButton.setEnabled(true);
@@ -497,10 +497,11 @@ public static void initGame(JFrame frame, int numPlayers) {
                 players.get(playerNum).getProperty().subtractMoney(rent);
                 Game.checkWinner(players);
                 currentProperty.getOwner().getProperty().addMoney(rent);
-                
+                updateCurrentPlayerLabel();
+
             } else {
-                
-                  int choice = JOptionPane.showConfirmDialog(
+
+                int choice = JOptionPane.showConfirmDialog(
                         null,
                         "You landed on your own property: " + currentProperty.getName() + ".\nDo you want to upgrade it?",
                         "Upgrade Property",
@@ -509,10 +510,10 @@ public static void initGame(JFrame frame, int numPlayers) {
                 );
 
                 if (choice == JOptionPane.YES_OPTION) {
-                    upgradeProperty(players.get(currentPlayer),cellIndex-1);
+                    upgradeProperty(players.get(currentPlayer), cellIndex - 1);
                     panel.repaint();
-                    Game.saveProperties(players.get(currentPlayer).getPosition(),players.get(currentPlayer).id,properties[players.get(currentPlayer).getPosition()].getPropertyLevel());
-                }else {
+                    Game.saveProperties(players.get(currentPlayer).getPosition(), players.get(currentPlayer).id, properties[players.get(currentPlayer).getPosition()].getPropertyLevel());
+                } else {
                     JOptionPane.getRootFrame().dispose();
                 }
 
