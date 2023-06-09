@@ -1,4 +1,8 @@
-package com.mycompany.monopoly;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package monopoly;
 
 import java.awt.*;
 import javax.swing.*;
@@ -11,10 +15,10 @@ public class PlayerPositionTest {
 
     private static int currentPosition = 0;
     private static int[][] playerPositionsCoordinates = {
-          {65, 575}, {170, 515}, {260, 515}, {350, 515}, {440,515},
-                {575, 515}, {515,420}, {515, 330}, {515, 240}, {515, 150},
-                {515, 5}, {440, 75}, {350, 75}, {260, 75}, {170, 75},
-               {5, 55}, {75, 150}, {75, 240}, {75, 330}, {75, 420}
+        {65, 575}, {170, 515}, {260, 515}, {350, 515}, {440, 515},
+        {575, 515}, {515, 420}, {515, 330}, {515, 240}, {515, 150},
+        {515, 5}, {440, 75}, {350, 75}, {260, 75}, {170, 75},
+        {5, 55}, {75, 150}, {75, 240}, {75, 330}, {75, 420}
     };
 
     public static void main(String[] args) {
